@@ -1706,6 +1706,23 @@ AffineTransform Node::getNodeToParentAffineTransform(Node* ancestor) const
 
     return t;
 }
+
+Mat4 Node::getNodeToParentTransform(int desc) const
+{
+    Mat4 t(this->getNodeToParentTransform());
+    
+    for (Node *p = _parent; p != nullptr && desc > 0; p = p->getParent())
+    {
+        desc--;
+        
+        //    for (Node *p = _parent;  p != nullptr && p != ancestor ; p = p->getParent())
+        //    {
+        t = p->getNodeToParentTransform() * t;
+    }
+    
+    return t;
+}
+
 const Mat4& Node::getNodeToParentTransform() const
 {
     if (_transformDirty)
@@ -1872,6 +1889,12 @@ const Mat4& Node::getParentToNodeTransform() const
     return _inverse;
 }
 
+Mat4 Node::getParentToNodeTransform(int desc) const
+{
+    auto mat = getNodeToParentTransform(desc);
+    mat.inverse();
+    return mat;
+}
 
 AffineTransform Node::getNodeToWorldAffineTransform() const
 {

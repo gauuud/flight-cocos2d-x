@@ -700,7 +700,17 @@ dc[i] = (dc[i] - c[i]) / _particleData.timeToLive[i];\
     
     // position
     Vec2 pos;
-    if (_positionType == PositionType::FREE)
+    if (_positionType == PositionType::CUSTOME) {
+        
+        Mat4 tmp = getNodeToParentTransform(1);
+        Vec3 vec3(Vec2::ZERO.x, Vec2::ZERO.y, 0);
+        Vec3 ret;
+        tmp.transformPoint(vec3,&ret);
+        // currentPosition.set(vec3.x, vec3.y);
+        
+        pos.set(ret.x, ret.y);
+    }
+    else if (_positionType == PositionType::FREE)
     {
         pos = this->convertToWorldSpace(Vec2::ZERO);
     }

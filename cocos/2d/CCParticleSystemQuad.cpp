@@ -307,7 +307,17 @@ void ParticleSystemQuad::updateParticleQuads()
     }
  
     Vec2 currentPosition;
-    if (_positionType == PositionType::FREE)
+    if (_positionType == PositionType::CUSTOME) {
+        
+        Mat4 tmp = getNodeToParentTransform(1);
+        Vec3 vec3(Vec2::ZERO.x, Vec2::ZERO.y, 0);
+        Vec3 ret;
+        tmp.transformPoint(vec3,&ret);
+        // currentPosition.set(vec3.x, vec3.y);
+        
+        currentPosition.set(ret.x, ret.y);
+    }
+    else if (_positionType == PositionType::FREE)
     {
         currentPosition = this->convertToWorldSpace(Vec2::ZERO);
     }
@@ -342,6 +352,31 @@ void ParticleSystemQuad::updateParticleQuads()
         float* y = _particleData.posy;
         float* s = _particleData.size;
         float* r = _particleData.rotation;
+        V3F_C4B_T2F_Quad* quadStart = startQuad;
+        for (int i = 0 ; i < _particleCount; ++i, ++startX, ++startY, ++x, ++y, ++quadStart, ++s, ++r)
+        {
+            p2.set(*startX, *startY, 0);
+            worldToNodeTM.transformPoint(&p2);
+            newPos.set(*x,*y);
+            p2 = p1 - p2;
+            newPos.x -= p2.x - pos.x;
+            newPos.y -= p2.y - pos.y;
+            updatePosWithParticle(quadStart, newPos, *s, *r);
+        }
+    }
+    else if (_positionType == PositionType::CUSTOME) {
+        Vec2 newPos;
+        Vec3 p1(currentPosition.x, currentPosition.y, 0);
+        Mat4 worldToNodeTM = getParentToNodeTransform(1);
+        
+        worldToNodeTM.transformPoint(&p1);
+        float* startX = _particleData.startPosX;
+        float* startY = _particleData.startPosY;
+        float* x = _particleData.posx;
+        float* y = _particleData.posy;
+        float* s = _particleData.size;
+        float* r = _particleData.rotation;
+        Vec3 p2;
         V3F_C4B_T2F_Quad* quadStart = startQuad;
         for (int i = 0 ; i < _particleCount; ++i, ++startX, ++startY, ++x, ++y, ++quadStart, ++s, ++r)
         {

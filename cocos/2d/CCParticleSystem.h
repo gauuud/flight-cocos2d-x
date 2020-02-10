@@ -220,6 +220,7 @@ public:
         
         GROUPED, /** Living particles are attached to the emitter and are translated along with it. */
 
+        CUSTOME,
     };
     
     //* @enum
