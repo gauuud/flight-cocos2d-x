@@ -51,6 +51,8 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLContext;
 
+import com.sdkbox.plugin.SDKBox;
+
 public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelperListener {
     // ===========================================================
     // Constants
@@ -140,6 +142,7 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
         this.hideVirtualButton();
 
         onLoadNativeLibraries();
+        SDKBox.init(this);
 
         sContext = this;
         this.mHandler = new Cocos2dxHandler(this);
@@ -166,6 +169,7 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 
         // Audio configuration
         this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
     }
 
     //native method,call GLViewImpl::getGLContextAttrs() to get the OpenGL ES context attributions
@@ -178,6 +182,18 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
     // ===========================================================
     // Methods for/from SuperClass/Interfaces
     // ===========================================================
+    @Override
+    protected void onStart() {
+        Log.d(TAG, "onStart()");
+        super.onStart();
+        SDKBox.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        SDKBox.onStop();
+    }
 
     @Override
     protected void onResume() {
@@ -186,10 +202,19 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
         super.onResume();
         if(gainAudioFocus)
             Cocos2dxAudioFocusManager.registerAudioFocusListener(this);
+        SDKBox.onResume();
         this.hideVirtualButton();
        	resumeIfHasFocus();
     }
     
+
+    @Override
+    public void onBackPressed() {
+        if(!SDKBox.onBackPressed()) {
+            super.onBackPressed();
+        }
+    }
+
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
     	Log.d(TAG, "onWindowFocusChanged() hasFocus=" + hasFocus);
@@ -218,6 +243,7 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
         super.onPause();
         if(gainAudioFocus)
             Cocos2dxAudioFocusManager.unregisterAudioFocusListener(this);
+        SDKBox.onPause();
         Cocos2dxHelper.onPause();
         mGLSurfaceView.onPause();
     }
@@ -249,6 +275,9 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
             listener.onActivityResult(requestCode, resultCode, data);
         }
 
+        if(!SDKBox.onActivityResult(requestCode, resultCode, data)) {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
