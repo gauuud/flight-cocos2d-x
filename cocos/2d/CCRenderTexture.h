@@ -200,6 +200,8 @@ public:
      */
     bool saveToFile(const std::string& filename, Image::Format format, bool isRGBA = true, const std::function<void (RenderTexture*, const std::string&)>& callback = nullptr);
     
+    bool saveToFilePath(const std::string& filePath, Image::Format format, bool isRGBA, const std::function<void (RenderTexture*, const std::string&)> callback);
+    
     /** Listen "come to background" message, and save render texture.
      * It only has effect on Android.
      * 
